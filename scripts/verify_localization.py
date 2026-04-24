@@ -1,6 +1,5 @@
 import json
 from pathlib import Path
-from typing import Any
 
 PROJECT_ROOT = Path(__file__).resolve().parent.parent
 CONFIG = json.loads((PROJECT_ROOT / 'config.json').read_text(encoding='utf-8'))
@@ -20,6 +19,10 @@ def to_vm_path(host_path: str) -> Path:
             suffix = normalized[len(host_norm):].lstrip('/')
             return Path(vm_prefix) / suffix
     return Path(host_path)
+
+
+def decode_patch_text(value: str) -> str:
+    return value.encode('utf-8').decode('unicode_escape')
 
 
 ROOT_LOCALE_DST = to_vm_path(CONFIG['applyTargets']['rootLocale'])
@@ -48,7 +51,7 @@ def verify_locales() -> list[str]:
 def verify_assets() -> list[str]:
     issues: list[str] = []
     for patch in PATCHES:
-        old = patch['find']
+        old = decode_patch_text(patch['find'])
         for path in ASSETS_DIR.glob('*.js'):
             try:
                 text = path.read_text(encoding=ENCODING)
