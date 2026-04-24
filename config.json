@@ -1,0 +1,12 @@
+{
+  "projectName": "claude-desktop-zh-localization",
+  "targetResourceRoot": "C:\\Program Files\\WindowsApps\\Claude_1.3883.0.0_x64__pzs8sxrjxfjjc\\app\\resources",
+  "targetVersion": "1.3883.0.0",
+  "applyTargets": {
+    "rootLocale": "C:\\Program Files\\WindowsApps\\Claude_1.3883.0.0_x64__pzs8sxrjxfjjc\\app\\resources\\zh-CN.json",
+    "ionLocale": "C:\\Program Files\\WindowsApps\\Claude_1.3883.0.0_x64__pzs8sxrjxfjjc\\app\\resources\\ion-dist\\i18n\\zh-CN.json",
+    "assetsDir": "C:\\Program Files\\WindowsApps\\Claude_1.3883.0.0_x64__pzs8sxrjxfjjc\\app\\resources\\ion-dist\\assets\\v1"
+  },
+  "backupDirName": "backups",
+  "encoding": "utf-8"
+}

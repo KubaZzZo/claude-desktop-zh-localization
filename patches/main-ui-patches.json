@@ -1,0 +1,72 @@
+[
+  {
+    "description": "首页主标题",
+    "find": "defaultMessage:\"Let's knock something off your list\",id:\"CJsWpnmYD4\"",
+    "replace": "defaultMessage:\"开始处理你的待办事项\",id:\"CJsWpnmYD4\""
+  },
+  {
+    "description": "首页输入框提示",
+    "find": "defaultMessage:\"How can I help you today?\",id:\"XLcM6WHfQR\"",
+    "replace": "defaultMessage:\"今天我可以帮你做什么？\",id:\"XLcM6WHfQR\""
+  },
+  {
+    "description": "首页任务引导",
+    "find": "defaultMessage:\"Pick a task, any task\",id:\"OnaQpdV9zK\"",
+    "replace": "defaultMessage:\"随便选个任务开始吧\",id:\"OnaQpdV9zK\""
+  },
+  {
+    "description": "首页推荐卡 1",
+    "find": "defaultMessage:\"Optimize my week\",id:\"ov1AuKcjep\"",
+    "replace": "defaultMessage:\"优化我的这一周\",id:\"ov1AuKcjep\""
+  },
+  {
+    "description": "首页推荐卡 2",
+    "find": "defaultMessage:\"Organize my screenshots\",id:\"R9OYtL0hxN\"",
+    "replace": "defaultMessage:\"整理我的截图\",id:\"R9OYtL0hxN\""
+  },
+  {
+    "description": "首页推荐卡 3",
+    "find": "defaultMessage:\"Find insights in files\",id:\"JDTaxC6dOy\"",
+    "replace": "defaultMessage:\"从文件中发现洞察\",id:\"JDTaxC6dOy\""
+  },
+  {
+    "description": "首页安全说明",
+    "find": "defaultMessage:\"Learn how to use Cowork safely\",id:\"Cxr7ieOSct\"",
+    "replace": "defaultMessage:\"了解如何安全使用协作\",id:\"Cxr7ieOSct\""
+  },
+  {
+    "description": "项目入口",
+    "find": "defaultMessage:\"Work in a project\",id:\"bNgYGVAxfX\"",
+    "replace": "defaultMessage:\"在项目中工作\",id:\"bNgYGVAxfX\""
+  },
+  {
+    "description": "首页按钮",
+    "find": "defaultMessage:\"Let's go\",id:\"wVu1FLTwAn\"",
+    "replace": "defaultMessage:\"开始吧\",id:\"wVu1FLTwAn\""
+  },
+  {
+    "description": "清除活动项",
+    "find": "defaultMessage:\"Clear active\",id:\"0mQ4LBF4e8\"",
+    "replace": "defaultMessage:\"清除活动项\",id:\"0mQ4LBF4e8\""
+  },
+  {
+    "description": "协作侧栏标签",
+    "find": "defaultMessage:\"Cowork\",id:\"xi2NxiZh10\"",
+    "replace": "defaultMessage:\"协作\",id:\"xi2NxiZh10\""
+  },
+  {
+    "description": "推荐标签",
+    "find": "Recommended",
+    "replace": "推荐"
+  },
+  {
+    "description": "其他选项按钮",
+    "find": "Something else",
+    "replace": "其他选项"
+  },
+  {
+    "description": "安装说明选项",
+    "find": "Test setup instructions",
+    "replace": "测试安装说明"
+  }
+]
