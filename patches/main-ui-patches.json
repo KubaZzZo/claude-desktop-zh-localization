@@ -1,0 +1,7 @@
+[
+  {
+    "description": "安装说明选项",
+    "find": "defaultMessage:\"Test setup instructions\",id:\"qmzHEfH73H\"",
+    "replace": "defaultMessage:\"测试安装说明\",id:\"qmzHEfH73H\""
+  }
+]

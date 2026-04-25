@@ -1,0 +1,6 @@
+backups/
+__pycache__/
+*.pyc
+*.log
+.claude/
+CProgram FilesWindowsAppsClaude_1.3883.0.0_x64__pzs8sxrjxfjjcappresources\
