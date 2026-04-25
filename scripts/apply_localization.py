@@ -1,4 +1,5 @@
 import json
+import os
 import shutil
 from datetime import datetime
 from pathlib import Path
@@ -13,6 +14,10 @@ ION_LOCALE_SRC = PROJECT_ROOT / 'locales' / 'ion-zh-CN.json'
 ROOT_LOCALE_DST = Path(CONFIG['applyTargets']['rootLocale'])
 ION_LOCALE_DST = Path(CONFIG['applyTargets']['ionLocale'])
 ASSETS_DIR = Path(CONFIG['applyTargets']['assetsDir'])
+ION_OVERRIDES_SRC = PROJECT_ROOT / 'locales' / 'ion-zh-CN.overrides.json'
+ION_OVERRIDES_DST = Path(CONFIG.get('optionalTargets', {}).get('ionOverrides', '')) if CONFIG.get('optionalTargets', {}).get('ionOverrides') else None
+STATSIG_SRC_DIR = PROJECT_ROOT / 'locales' / 'statsig'
+STATSIG_DST_DIR = Path(CONFIG.get('optionalTargets', {}).get('statsigDir', '')) if CONFIG.get('optionalTargets', {}).get('statsigDir') else None
 ENCODING = CONFIG.get('encoding', 'utf-8')
 
 
@@ -36,10 +41,56 @@ def ensure_assets_dir(path: Path) -> None:
         raise SystemExit(f'Assets path is not a directory: {path}')
 
 
+def expand_path(value: str) -> Path:
+    return Path(os.path.expandvars(value))
+
+
+def find_existing_paths(candidates: list[str]) -> list[Path]:
+    paths = []
+    for candidate in candidates:
+        path = expand_path(candidate)
+        if path.exists():
+            paths.append(path)
+    return paths
+
+
+def detect_optional_resources() -> dict[str, object]:
+    overrides_exists = bool(ION_OVERRIDES_DST and ION_OVERRIDES_DST.exists())
+    statsig_exists = bool(STATSIG_DST_DIR and STATSIG_DST_DIR.exists() and STATSIG_DST_DIR.is_dir())
+    statsig_files = sorted(STATSIG_DST_DIR.glob('*.json')) if statsig_exists else []
+    return {
+        'availableInstallRoots': [str(path) for path in find_existing_paths(CONFIG.get('installCandidates', []))],
+        'ionOverrides': {
+            'configured': bool(ION_OVERRIDES_DST),
+            'exists': overrides_exists,
+            'sourceExists': ION_OVERRIDES_SRC.exists(),
+            'target': str(ION_OVERRIDES_DST) if ION_OVERRIDES_DST else None,
+        },
+        'statsig': {
+            'configured': bool(STATSIG_DST_DIR),
+            'exists': statsig_exists,
+            'sourceExists': STATSIG_SRC_DIR.exists(),
+            'target': str(STATSIG_DST_DIR) if STATSIG_DST_DIR else None,
+            'targetFiles': [str(path) for path in statsig_files],
+        },
+    }
+
+
 def backup_file(src: Path, backup_dir: Path) -> None:
     ensure_dir(backup_dir)
     if src.exists():
         shutil.copy2(src, backup_dir / src.name)
+
+
+def backup_tree(src_dir: Path, backup_dir: Path) -> list[str]:
+    ensure_dir(backup_dir)
+    copied: list[str] = []
+    if not src_dir.exists() or not src_dir.is_dir():
+        return copied
+    for item in sorted(src_dir.glob('*.json')):
+        shutil.copy2(item, backup_dir / item.name)
+        copied.append(str(item))
+    return copied
 
 
 def decode_patch_text(value: str) -> str:
@@ -103,6 +154,39 @@ def apply_patches_to_file(path: Path) -> list[tuple[str, int]]:
     return counts
 
 
+def sync_optional_resources(run_dir: Path) -> dict[str, object]:
+    optional_report = detect_optional_resources()
+
+    if optional_report['ionOverrides']['exists'] and ION_OVERRIDES_DST:
+        backup_file(ION_OVERRIDES_DST, run_dir / 'ion-overrides')
+        if ION_OVERRIDES_SRC.exists():
+            shutil.copy2(ION_OVERRIDES_SRC, ION_OVERRIDES_DST)
+            optional_report['ionOverrides']['synced'] = True
+        else:
+            optional_report['ionOverrides']['synced'] = False
+    else:
+        optional_report['ionOverrides']['synced'] = False
+
+    if optional_report['statsig']['exists'] and STATSIG_DST_DIR:
+        optional_report['statsig']['backedUpFiles'] = backup_tree(STATSIG_DST_DIR, run_dir / 'statsig')
+        if STATSIG_SRC_DIR.exists():
+            copied_files: list[str] = []
+            for src_file in sorted(STATSIG_SRC_DIR.glob('*.json')):
+                shutil.copy2(src_file, STATSIG_DST_DIR / src_file.name)
+                copied_files.append(str(src_file))
+            optional_report['statsig']['synced'] = True
+            optional_report['statsig']['copiedFiles'] = copied_files
+        else:
+            optional_report['statsig']['synced'] = False
+            optional_report['statsig']['copiedFiles'] = []
+    else:
+        optional_report['statsig']['synced'] = False
+        optional_report['statsig']['copiedFiles'] = []
+        optional_report['statsig']['backedUpFiles'] = []
+
+    return optional_report
+
+
 def main() -> None:
     ensure_file_exists(ROOT_LOCALE_DST, 'Target root locale')
     ensure_file_exists(ION_LOCALE_DST, 'Target ion locale')
@@ -126,6 +210,7 @@ def main() -> None:
 
     shutil.copy2(ROOT_LOCALE_SRC, ROOT_LOCALE_DST)
     shutil.copy2(ION_LOCALE_SRC, ION_LOCALE_DST)
+    optional_report = sync_optional_resources(run_dir)
 
     file_report: list[dict[str, object]] = []
     for path in patch_targets:
@@ -148,6 +233,11 @@ def main() -> None:
         },
         'patches': patch_analysis,
         'files': file_report,
+        'optionalResources': optional_report,
+        'copiedLocales': {
+            'rootLocale': str(ROOT_LOCALE_DST),
+            'ionLocale': str(ION_LOCALE_DST),
+        },
     }
 
     report_path = run_dir / 'apply-report.json'
@@ -157,6 +247,10 @@ def main() -> None:
     print(f"Matched patches: {report['summary']['matchedPatches']}/{report['summary']['totalPatches']}")
     print(f"Already patched: {report['summary']['alreadyPatchedPatches']}")
     print(f"Unmatched patches: {report['summary']['unmatchedPatches']}")
+    if optional_report['ionOverrides']['exists']:
+        print(f"Overrides synced: {optional_report['ionOverrides']['synced']}")
+    if optional_report['statsig']['exists']:
+        print(f"Statsig synced: {optional_report['statsig']['synced']}")
 
 
 if __name__ == '__main__':

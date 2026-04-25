@@ -11,12 +11,13 @@
 ## 当前能力
 
 - 一键备份当前目标资源并应用中文化
-- 一键校验语言包与主 UI fallback 是否仍有英文残留
+- 一键校验语言包、可选 i18n 资源与主 UI fallback 是否仍有英文残留
 - 一键回滚到最近一次应用前的备份状态
 - 提供 `start.bat`，双击即可按 `apply -> verify` 流程执行
 - 独立维护 `root-zh-CN.json` 与 `ion-zh-CN.json` 两份中文语言文件
+- 支持在目标目录存在时同步和校验可选资源，如 `zh-CN.overrides.json` 与 `statsig/*.json`
 - 通过 `main-ui-patches.json` 维护少量语言包之外仍需保留的运行时字符串替换规则
-- 在 `apply-report.json` 中输出补丁命中、已补丁和未命中状态，便于版本升级后快速判断哪些补丁仍然有效
+- 在 `apply-report.json` 中输出补丁命中、已补丁、未命中以及可选资源同步状态，便于版本升级后快速判断哪些补丁仍然有效
 
 ## 已覆盖内容
 
