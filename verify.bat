@@ -1,5 +1,5 @@
 @echo off
 setlocal
 cd /d %~dp0
-python scripts\verify_localization.py
+py -3 scripts\verify_localization.py
 endlocal
