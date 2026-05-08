@@ -1,192 +1,506 @@
-# Claude Desktop 中文化项目
+# Claude Desktop 中文本地化工具
 
-一个把 Claude Desktop 简体中文本地化流程工程化的项目。它不是一次性的手工改文件记录，而是把语言包维护、运行时补丁、备份、应用、校验、回滚整理成一套可重复执行的方案，方便在版本更新后继续复用。
+这个仓库用于维护 Claude Desktop 的简体中文本地化资源和自动应用脚本。它不是一次性的手工改文件记录，而是一套可重复执行的本地化流程：同步中文语言包、修补运行时硬编码文案、备份原始资源、验证结果、恢复英文、回滚最近一次应用。
 
-## 项目定位
+当前项目重点面向 Windows 版 Claude Desktop，尤其是 Microsoft Store/WindowsApps 安装结构。脚本会优先尝试自动发现当前机器上最新的 Claude 安装目录，因此 Claude Desktop 升级版本后通常不需要手动改路径。
 
-这个项目的目标是把“临时汉化”变成“可维护的本地化工程”。它主要解决三件事：第一，给 Claude Desktop 的主要界面和部分运行时文案提供较完整的简体中文体验；第二，把修改过程沉淀为项目文件和脚本，而不是每次重新手工编辑资源；第三，在后续版本更新时，可以通过备份、应用、校验、回滚快速复用已有成果。
+## 主要能力
 
-当前项目已经覆盖语言包同步、最小必要的运行时 fallback 字符串补丁、自动校验与回滚流程，并补充了一键启动入口，适合作为个人维护版 Claude Desktop 中文化仓库继续迭代。
+- 自动定位 Claude Desktop 安装目录。
+- 同步 `zh-CN.json`、`ion-dist/i18n/zh-CN.json`、Statsig 等中文资源。
+- 对语言包覆盖不到的打包 JS 硬编码英文做运行时补丁。
+- 每次应用前自动备份目标资源，便于回滚。
+- 支持恢复英文资源后重新汉化。
+- 检测缺失的 `defaultMessage id`，并生成维护文档。
+- 检测 mojibake 乱码和 `??`、`???` 问号占位翻译。
+- 提供完整验证命令和 pytest 测试。
 
-## 当前能力
+## 当前覆盖状态
 
-- 一键备份当前目标资源并应用中文化
-- 一键校验语言包、可选 i18n 资源与主 UI fallback 是否仍有英文残留
-- 一键回滚到最近一次应用前的备份状态
-- 提供 `start.bat`，双击即可按 `apply -> verify` 流程执行
-- 独立维护 `root-zh-CN.json` 与 `ion-zh-CN.json` 两份中文语言文件
-- 支持在目标目录存在时同步和校验可选资源，如 `zh-CN.overrides.json` 与 `statsig/*.json`
-- 通过 `main-ui-patches.json` 维护少量语言包之外仍需保留的运行时字符串替换规则
-- 在 `apply-report.json` 中输出补丁命中、已补丁、未命中以及可选资源同步状态，便于版本升级后快速判断哪些补丁仍然有效
+最近一次维护后，已确认：
 
-## 已覆盖内容
+- `defaultMessage id` 剩余数量为 `0`。
+- `billing`、`claude-code`、`general` 分组均已补齐。
+- mojibake 检测结果为 `0`。
+- 已修复设置页头像等 `??` 问号占位文案。
+- 已补 Projects 页面硬编码文案，例如 `Projects`、`New project`。
+- 已补计划任务页面硬编码文案，例如 `Run tasks on a schedule...`、`No scheduled tasks yet.`。
+- `pytest scripts -q` 在本地项目中通过。
 
-当前这轮整理与固化已经覆盖以下内容：
+仍需注意：Claude Desktop 每次升级都可能改变前端打包文件名和硬编码文本位置。如果升级后发现新英文残留，应按“维护新翻译”的流程继续补丁。
 
-- 首页主标题、输入框提示、任务引导等关键首页文案
-- Cowork / 协作相关主界面入口文案
-- `Test setup instructions` 等仍需运行时替换的少量选项
-- “其他选项”“测试安装说明”等关键文案的自动校验
-- 面向后续版本复用的备份、应用、校验、回滚流程
+## 快速开始
+
+在项目根目录执行：
+
+```bat
+auto-localize.bat
+```
+
+或直接执行：
+
+```bat
+py -3 scripts\auto_localize.py --report backups\auto-localize-next.json
+```
+
+`auto_localize.py` 会按顺序执行：
+
+1. 同步设置页专项翻译。
+2. 自动定位 Claude Desktop 安装目录。
+3. 应用中文语言包和运行时补丁。
+4. 修复可检测的 mojibake 资源。
+5. 运行应用结果验证。
+6. 输出报告到 `backups/auto-localize-next.json`。
+
+执行完成后，完全退出并重新打开 Claude Desktop。Electron 应用可能缓存旧 JS 资源，只刷新页面不一定能看到最新效果。
+
+## 常用命令
+
+### 一键应用并验证
+
+```bat
+auto-localize.bat
+```
+
+适合日常使用。它比单独运行 `apply.bat` 更完整，因为它会自动处理设置页专项翻译、mojibake 检查和报告输出。
+
+### 只应用中文资源
+
+```bat
+apply.bat --auto-detect
+```
+
+或：
+
+```bat
+py -3 scripts\apply_localization.py --auto-detect
+```
+
+该命令会备份当前安装目录中的资源，然后复制项目维护的中文资源，并按 `patches/main-ui-patches.json` 修补打包 JS 中的硬编码英文。
+
+### 验证已安装资源
+
+```bat
+verify.bat --auto-detect
+```
+
+或：
+
+```bat
+py -3 scripts\verify_localization.py --auto-detect
+```
+
+用于确认关键中文条目和运行时补丁是否已经应用。
+
+### 恢复英文
+
+```bat
+restore-english.bat --auto-detect
+```
+
+或：
+
+```bat
+python scripts\restore_reference_localization.py --auto-detect
+```
+
+恢复英文后，可以再次运行 `auto-localize.bat` 重新汉化。
+
+### 回滚最近一次应用
+
+```bat
+rollback.bat
+```
+
+回滚使用 `backups/` 中最近一次 apply 生成的备份。它适合撤销最近一次本项目造成的资源变更。
+
+### 检查资源文件
+
+```bat
+python scripts\validate_resources.py
+```
+
+该命令会检查：
+
+- `locales/` 和 `patches/` 下 JSON 是否可解析。
+- 参考脚本是否有语法错误。
+- JSON 字符串中是否存在 `??`、`???` 这类问号占位翻译。
+
+### 重新提取缺失翻译 ID
+
+```bat
+py -3 scripts\extract_missing_locale_ids.py
+```
+
+输出：
+
+- `docs/missing-locale-ids.json`
+- `docs/missing-locale-ids.md`
+
+如果结果不是 `missing ids: 0`，说明还有 `defaultMessage` 对应的中文条目缺失，需要继续维护 `locales/ion-zh-CN.json` 或 `locales/root-zh-CN.json`。
+
+### 检查 mojibake
+
+```bat
+py -3 scripts\repair_mojibake_assets.py --auto-detect --check
+```
+
+结果应为：
+
+```text
+mojibake asset files: 0
+```
+
+### 运行测试
+
+```bat
+pytest scripts -q
+```
+
+维护脚本或资源结构后都应运行该命令。
+
+## 推荐验证流程
+
+每次修改翻译或补丁后，建议按以下顺序执行：
+
+```bat
+py -3 scripts\apply_settings_translations.py
+py -3 scripts\extract_missing_locale_ids.py
+python scripts\validate_resources.py
+pytest scripts -q
+py -3 scripts\auto_localize.py --report backups\auto-localize-next.json
+py -3 scripts\repair_mojibake_assets.py --auto-detect --check
+```
+
+关键通过标准：
+
+- `missing ids: 0`
+- `All resource files validated.`
+- `pytest scripts -q` 全部通过
+- `Auto-localize status: ok`
+- `Missing installed ids: 0`
+- `Mojibake after repair: 0`
+- `mojibake asset files: 0`
 
 ## 项目结构
 
 ```text
-chineseTwo-v2/
-├─ config.json          # 新增 verifyEntries，校验条目从脚本移到配置
-├─ start.bat
+.
+├─ auto-localize.bat
 ├─ apply.bat
 ├─ verify.bat
 ├─ rollback.bat
+├─ restore-english.bat
+├─ install-complete-zh-cn.bat
+├─ config.json
 ├─ locales/
 │  ├─ root-zh-CN.json
-│  └─ ion-zh-CN.json
+│  ├─ ion-zh-CN.json
+│  ├─ ion-zh-CN.overrides.json
+│  └─ statsig/
+│     └─ zh-CN.json
 ├─ patches/
 │  └─ main-ui-patches.json
 ├─ scripts/
-│  ├─ common.py             # 新增：共享配置、路径常量、工具函数
+│  ├─ auto_localize.py
 │  ├─ apply_localization.py
+│  ├─ apply_settings_translations.py
+│  ├─ extract_missing_locale_ids.py
+│  ├─ repair_mojibake_assets.py
+│  ├─ restore_reference_localization.py
+│  ├─ rollback_localization.py
+│  ├─ validate_resources.py
 │  ├─ verify_localization.py
-│  └─ rollback_localization.py
-├─ backups/
-└─ docs/
-   └─ USAGE.md
+│  └─ test_*.py
+├─ docs/
+│  ├─ missing-locale-ids.json
+│  ├─ missing-locale-ids.md
+│  ├─ USAGE.md
+│  └─ COMPATIBILITY.md
+└─ backups/
 ```
 
-## 工作原理
+`backups/` 是运行产物，不应提交到仓库。
 
-这个项目的中文化来自两部分配合。
+## 核心文件说明
 
-第一部分是 `locales/` 目录中的中文语言文件。执行 apply 时，项目会把 `root-zh-CN.json` 和 `ion-zh-CN.json` 复制到目标资源位置。
+### `locales/root-zh-CN.json`
 
-第二部分是 `patches/main-ui-patches.json` 中维护的运行时补丁规则。当前只保留少量仍未被语言包完全覆盖的文案；脚本会扫描前端打包产物里的对应英文 fallback，并按规则替换为中文。
+Claude Desktop 根级中文语言资源，主要覆盖顶层菜单、基础设置、桌面端原生相关文案。
 
-也就是说，这个项目不是单纯“覆盖一个中文包”，而是“语言包 + 运行时补丁 + 校验”一起工作。
+### `locales/ion-zh-CN.json`
 
-## 使用方式
+Claude Desktop 前端主界面的中文语言资源。大部分界面文案都在这里维护，包括通用界面、设置页、项目、账单、Claude Code、插件、隐私等内容。
 
-### 推荐方式：一键启动
+### `locales/ion-zh-CN.overrides.json`
 
-项目根目录提供了一个总入口：
+可选覆盖资源。目标安装目录存在对应文件时会被同步；不存在时自动跳过。
 
-- `start.bat`：按 `apply -> verify` 顺序自动执行，并在结束后保留窗口输出，方便查看结果
+### `locales/statsig/zh-CN.json`
 
-这是日常使用最方便的入口，适合大多数情况。
+Statsig 相关中文资源。目标安装目录存在 statsig 语言目录时会同步。
 
-### 单独执行
+### `patches/main-ui-patches.json`
 
-如果你想手动分步处理，也可以直接使用下面三个入口：
+运行时 JS 补丁表。它用于处理语言包覆盖不到的硬编码英文，例如：
 
-- `apply.bat`：备份当前资源并应用中文化
-- `verify.bat`：校验目标语言文件和主 UI fallback 是否仍有英文残留
-- `rollback.bat`：回滚到最近一次备份
+- 打包 JS 中直接写死的按钮文案。
+- 某些页面的标题、副标题和空状态。
+- 版本升级后没有进入 locale JSON 的 fallback 字符串。
 
-### 推荐流程
+补丁项一般包含：
 
-标准使用顺序通常是：先执行 `start.bat` 或 `apply.bat` 应用中文化，再打开 Claude Desktop 实际检查界面效果；如果后续做了增量维护，可以执行 `verify.bat` 做快速复检；如果某次修改不符合预期，再通过 `rollback.bat` 回到最近一次备份状态。
+```json
+{
+  "description": "human readable description",
+  "filePattern": "index-*.js",
+  "find": "English string or minified JS fragment",
+  "replace": "Chinese string or patched JS fragment"
+}
+```
 
-## 配置说明
+如果只想扫描某个文件前缀，可以设置 `filePattern`。如果不设置，默认扫描所有 `*.js`。
 
-项目核心配置位于 `config.json`。
+### `docs/missing-locale-ids.json`
 
-当前配置中维护了：
+由 `scripts/extract_missing_locale_ids.py` 生成，用于追踪安装资源中仍缺失的 `defaultMessage id`。
 
-- Claude Desktop 目标资源根目录
-- `root` 语言文件目标路径
-- `ion` 语言文件目标路径
-- 前端资源 `assetsDir` 路径
-- 当前目标版本号
-- 备份目录名称与编码方式
+### `docs/missing-locale-ids.md`
 
-如果 Claude Desktop 升级后资源目录或版本号发生变化，通常需要优先检查并更新这里的路径配置，再重新执行 apply 与 verify。
+同一份缺失 ID 的 Markdown 报告，便于人工查看和分组维护。
 
-## 权限与运行前提
+## 脚本说明
 
-这是一个非常重要的前提。
+### `scripts/auto_localize.py`
 
-当前项目默认目标路径指向：
+推荐的一键流程脚本。它串联设置页翻译同步、应用中文资源、mojibake 修复、安装结果验证和报告输出。
 
-`C:\Program Files\WindowsApps\Claude_1.3883.0.0_x64__pzs8sxrjxfjjc\app\resources`
+### `scripts/apply_localization.py`
 
-也就是说，这套脚本默认是直接对安装在 `WindowsApps` 目录下的 Claude Desktop 资源进行读取、备份、复制和补丁处理。
+负责把项目中的中文资源应用到 Claude Desktop 安装目录。
 
-因此项目运行时通常有以下前提：
+它会：
 
-- 目标 Claude Desktop 确实安装在配置里对应的位置
-- 用户对该目标资源路径具备读取权限，否则无法备份、分析和校验
-- 用户对该目标资源路径具备写入权限，否则无法真正执行 apply
+1. 解析目标路径。
+2. 备份 root locale、ion locale、可选资源和命中的 JS 文件。
+3. 复制中文 JSON。
+4. 应用 `main-ui-patches.json` 中的运行时补丁。
+5. 生成 `backups/<timestamp>/apply-report.json`。
 
-如果目标目录不可访问，项目结构本身仍然成立，但只能做有限分析，无法真正把中文化应用到实际安装资源上。
+### `scripts/apply_settings_translations.py`
 
-## 备份、应用、校验与回滚
+维护设置页中一些容易遗漏或曾出现问号占位的翻译。它会把专项翻译同步到 locale 和 patch 数据中。
 
-### 备份
+### `scripts/extract_missing_locale_ids.py`
 
-每次执行 `apply.bat` 或通过 `start.bat` 进入 apply 流程时，项目都会在 `backups/` 下生成一个时间戳目录，保存本次应用前的资源副本。
+从当前安装资源和项目资源中提取 `defaultMessage`，对比中文 locale，生成缺失 ID 报告。
 
-### 应用
+### `scripts/repair_mojibake_assets.py`
 
-`apply_localization.py` 会先备份目标语言文件与命中的 js 资源，再复制项目中的中文语言文件，并按 `main-ui-patches.json` 的规则尝试替换运行时 fallback 文案。
+检测或修复安装资源中可识别的 mojibake 乱码。
 
-### 校验
+常用检查命令：
 
-`verify_localization.py` 会同时检查两部分：一部分是目标语言包中是否存在关键中文条目，另一部分是打包后的前端资源中是否仍保留关键英文 fallback。这样可以在版本更新后快速判断哪些内容失效、哪些补丁需要继续补充。
+```bat
+py -3 scripts\repair_mojibake_assets.py --auto-detect --check
+```
 
-### 回滚
+### `scripts/validate_resources.py`
 
-`rollback.bat` 会把最近一次备份中的资源恢复回目标位置，用于撤销最近一次 apply 的影响。
+资源质量门禁。它会检查 JSON 结构、参考脚本语法和问号占位翻译。
 
-## apply-report 报告说明
+### `scripts/verify_localization.py`
 
-每次成功执行 apply 后，项目都会在本次备份目录中生成一个 `apply-report.json`。
+验证已安装 Claude Desktop 资源是否包含关键中文条目，以及关键运行时补丁是否仍有效。
 
-这份报告会记录：
+### `scripts/rollback_localization.py`
 
-- 总补丁数
-- 命中的补丁数
-- 已经处于补丁结果状态的补丁数
-- 未命中的补丁数
-- 实际修改的文件数
-- 每条补丁命中了哪些文件、命中次数是多少
+把最近一次备份恢复到安装目录。
 
-这对版本升级场景非常有帮助。因为某次升级后，即使脚本还能运行，也不代表补丁仍然有效。通过 `apply-report.json`，可以更快看出是“补丁已全部失效”，还是“只有部分补丁仍然命中”。
+## 自动检测安装目录
 
-需要注意的是，`Patched files: 0` 或 `Matched patches: 0` 并不一定代表失败。如果目标资源当前已经是应用后的状态，再次执行 apply 可能就是 0 命中、0 修改；这时仍需要结合 `verify` 结果一起判断。
+多数命令支持：
 
-## 适用场景
+```bat
+--auto-detect
+```
 
-这个项目适合以下场景：
+自动检测会在 WindowsApps 等常见位置中寻找最新的 Claude Desktop 安装目录。对于 Microsoft Store 版 Claude，这通常比手动维护 `config.json` 中的旧版本号更可靠。
 
-- 你希望把 Claude Desktop 的中文化整理成可重复执行的方案
-- 你希望在版本更新后快速重新应用已有翻译成果
-- 你希望把运行时补丁和语言包维护统一放进同一个项目
-- 你希望把个人维护结果沉淀成可共享、可托管的仓库
+也可以手动指定 Claude 的 `app` 目录：
 
-## 当前局限
+```bat
+py -3 scripts\apply_localization.py --app-dir "D:\Claude\app"
+```
 
-这个项目当前是一个“可用的个人维护型工程”，但并不是完全无环境依赖的通用安装器。主要局限包括：
+注意：`--app-dir` 指向的是 Claude 的 `app` 目录，不是 `resources` 目录。
 
-- 默认目标路径与当前版本号存在耦合
-- 某些运行时文案仍可能继续变化，后续仍需补丁追踪
-- `WindowsApps` 目录权限在不同机器上不一定一致
-- 某些补丁规则在未来版本中仍可能因为打包形式变化而失效
-- README 截图路径目前仍建议继续整理为仓库内稳定资源路径
+## 备份和报告
 
-## 后续迭代方向
+每次应用都会创建：
 
-接下来仍值得继续完善的方向包括：
+```text
+backups/YYYYMMDD-HHMMSS/
+```
 
-- 继续补齐尚未定位来源的运行时英文文案
-- 增强补丁匹配规则的稳健性与可诊断性
-- 增加启动前权限检查或路径可用性检查
-- 按版本维护兼容说明
-- 把截图复制进仓库并改为稳定相对路径
-- 补充更多界面对照截图与实际验证说明
+其中通常包含：
 
-## 相关说明
+- 原始 root locale 备份。
+- 原始 ion locale 备份。
+- 命中的 JS 资源备份。
+- 可选 statsig/overrides 资源备份。
+- `apply-report.json`。
 
-更具体的脚本使用说明可参考：
+`apply-report.json` 会记录：
 
-- [docs/USAGE.md](docs/USAGE.md)
+- 总补丁数量。
+- 本次命中的补丁数量。
+- 已经处于补丁后状态的补丁数量。
+- 未命中的补丁数量。
+- 实际修改了哪些 JS 文件。
+- 可选资源是否存在并已同步。
 
-如果你拿到新的版本资源，也可以直接在 `locales/` 与 `patches/` 中继续增量维护，再重新执行应用和校验流程。
+如果 `Matched patches: 0`，不一定代表失败。若目标资源已经被补丁过，再次运行时可能显示为 `Already patched`。
+
+## 维护新翻译
+
+### 1. 处理 locale 缺失
+
+运行：
+
+```bat
+py -3 scripts\extract_missing_locale_ids.py
+```
+
+查看：
+
+```text
+docs/missing-locale-ids.md
+docs/missing-locale-ids.json
+```
+
+把缺失 ID 补到对应 locale 文件：
+
+- root 相关补 `locales/root-zh-CN.json`
+- 主前端相关补 `locales/ion-zh-CN.json`
+
+要求：
+
+- 不要写“本地化文本”这类占位翻译。
+- 保留 ICU 占位符，例如 `{count}`、`{provider}`。
+- 保留 HTML tag，例如 `<link>`、`<b>`、`<learnMoreLink>`。
+- 保留变量名和结构，不要改 key。
+
+### 2. 处理硬编码英文
+
+如果 `missing ids: 0`，但界面仍有英文，通常说明该文案没有走 locale，而是打包 JS 里的硬编码字符串。
+
+处理方法：
+
+1. 在安装目录的 `ion-dist/assets/v1/*.js` 中搜索英文原文。
+2. 找到稳定的最小 JS 片段。
+3. 在 `patches/main-ui-patches.json` 添加 `find`/`replace`。
+4. 运行 `python scripts\validate_resources.py`。
+5. 运行 `py -3 scripts\apply_localization.py --auto-detect`。
+6. 再次搜索安装 JS，确认英文消失、中文写入。
+
+示例场景：
+
+- Projects 页面中的 `Projects`、`New project`。
+- 计划任务页面中的 `Run tasks on a schedule...`、`No scheduled tasks yet.`。
+
+### 3. 每批维护后验证
+
+建议每补一批都运行：
+
+```bat
+py -3 scripts\apply_settings_translations.py
+py -3 scripts\extract_missing_locale_ids.py
+python scripts\validate_resources.py
+pytest scripts -q
+```
+
+最后运行：
+
+```bat
+py -3 scripts\auto_localize.py --report backups\auto-localize-next.json
+py -3 scripts\repair_mojibake_assets.py --auto-detect --check
+```
+
+## 常见问题
+
+### 为什么 `missing ids: 0` 但界面还有英文？
+
+因为并非所有界面文案都来自 locale JSON。有些文案是前端打包 JS 中的硬编码字符串，需要在 `patches/main-ui-patches.json` 中维护运行时补丁。
+
+### 为什么修改后界面还是旧英文？
+
+通常是 Claude Desktop 仍在运行或缓存了旧资源。请完全退出 Claude Desktop，再重新打开。
+
+### 为什么出现 `??` 或 `????`？
+
+这通常是编码写入错误或占位翻译。当前 `validate_resources.py` 会拒绝这类问号占位，避免它们进入资源文件。
+
+### 为什么 README 或旧文档里有乱码？
+
+早期文件可能经历过错误编码读写。当前 README 已按 UTF-8 重写。后续编辑时应使用 UTF-8，并避免通过非 UTF-8 控制台直接写中文。
+
+### 可以删除 `_patch_*.py` 这类脚本吗？
+
+可以。这些是历史一次性补丁脚本，真正生效的翻译已经沉淀到 `locales/` 或 `patches/` 中。当前正式流程不依赖它们。
+
+### Claude Desktop 升级后怎么办？
+
+先运行：
+
+```bat
+py -3 scripts\auto_localize.py --report backups\auto-localize-next.json
+```
+
+然后查看报告中的：
+
+- `Missing installed ids`
+- `Mojibake after repair`
+- `Matched patches`
+- `Already patched`
+- `Unmatched patches`
+
+如果有新增英文残留，再按“维护新翻译”继续补。
+
+## 发布和提交建议
+
+提交前至少运行：
+
+```bat
+python scripts\validate_resources.py
+pytest scripts -q
+```
+
+如果改了真实汉化内容，还应运行：
+
+```bat
+py -3 scripts\auto_localize.py --report backups\auto-localize-next.json
+py -3 scripts\repair_mojibake_assets.py --auto-detect --check
+```
+
+不要提交：
+
+- `backups/`
+- `__pycache__/`
+- `.pytest_cache/`
+- 临时日志
+- 本地安装资源副本
+- 个人 token 或凭据
+
+## 当前仓库状态说明
+
+这个项目主要维护 Claude Desktop 中文化资源和脚本，不修改 Claude Desktop 程序源码。所有变更都通过复制 JSON 资源和替换打包 JS 文本片段完成。
+
+如果你发现某个界面还有英文，最有用的信息是：
+
+1. 截图。
+2. 英文原文。
+3. 所在页面或操作路径。
+4. 当前 Claude Desktop 版本。
+
+拿到这些信息后，通常可以通过 locale 补齐或 runtime patch 继续完善。
