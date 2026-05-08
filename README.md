@@ -32,8 +32,8 @@
 ## 项目结构
 
 ```text
-chineseTwo/
-├─ config.json
+chineseTwo-v2/
+├─ config.json          # 新增 verifyEntries，校验条目从脚本移到配置
 ├─ start.bat
 ├─ apply.bat
 ├─ verify.bat
@@ -44,6 +44,7 @@ chineseTwo/
 ├─ patches/
 │  └─ main-ui-patches.json
 ├─ scripts/
+│  ├─ common.py             # 新增：共享配置、路径常量、工具函数
 │  ├─ apply_localization.py
 │  ├─ verify_localization.py
 │  └─ rollback_localization.py

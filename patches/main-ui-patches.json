@@ -3,5 +3,655 @@
     "description": "安装说明选项",
     "find": "defaultMessage:\"Test setup instructions\",id:\"qmzHEfH73H\"",
     "replace": "defaultMessage:\"测试安装说明\",id:\"qmzHEfH73H\""
+  },
+  {
+    "description": "c71860c77-DNv5VYLZ.js: \"Egress Requirements\"",
+    "filePattern": "c71860c77-DNv5VYLZ.js",
+    "find": "\"Egress Requirements\"",
+    "replace": "\"出口要求\""
+  },
+  {
+    "description": "c71860c77-DNv5VYLZ.js: \"Gateway base URL\"",
+    "filePattern": "c71860c77-DNv5VYLZ.js",
+    "find": "\"Gateway base URL\"",
+    "replace": "\"自定义 Base URL\""
+  },
+  {
+    "description": "c71860c77-DNv5VYLZ.js: \"Gateway API key\"",
+    "filePattern": "c71860c77-DNv5VYLZ.js",
+    "find": "\"Gateway API key\"",
+    "replace": "\"自定义 API Key\""
+  },
+  {
+    "description": "c71860c77-DNv5VYLZ.js: \"Gateway auth scheme\"",
+    "filePattern": "c71860c77-DNv5VYLZ.js",
+    "find": "\"Gateway auth scheme\"",
+    "replace": "\"自定义认证方式\""
+  },
+  {
+    "description": "c71860c77-DNv5VYLZ.js: \"Gateway extra headers\"",
+    "filePattern": "c71860c77-DNv5VYLZ.js",
+    "find": "\"Gateway extra headers\"",
+    "replace": "\"自定义额外请求头\""
+  },
+  {
+    "description": "c71860c77-DNv5VYLZ.js: \"Allow desktop extensions\"",
+    "filePattern": "c71860c77-DNv5VYLZ.js",
+    "find": "\"Allow desktop extensions\"",
+    "replace": "\"允许桌面扩展\""
+  },
+  {
+    "description": "c71860c77-DNv5VYLZ.js: \"Show extension directory\"",
+    "filePattern": "c71860c77-DNv5VYLZ.js",
+    "find": "\"Show extension directory\"",
+    "replace": "\"显示扩展目录\""
+  },
+  {
+    "description": "c71860c77-DNv5VYLZ.js: \"Require signed extensions\"",
+    "filePattern": "c71860c77-DNv5VYLZ.js",
+    "find": "\"Require signed extensions\"",
+    "replace": "\"要求扩展签名\""
+  },
+  {
+    "description": "c71860c77-DNv5VYLZ.js: \"Allow user-added MCP servers\"",
+    "filePattern": "c71860c77-DNv5VYLZ.js",
+    "find": "\"Allow user-added MCP servers\"",
+    "replace": "\"允许用户添加 MCP 服务器\""
+  },
+  {
+    "description": "c71860c77-DNv5VYLZ.js: \"Allow Claude Code tab\"",
+    "filePattern": "c71860c77-DNv5VYLZ.js",
+    "find": "\"Allow Claude Code tab\"",
+    "replace": "\"允许 Claude Code 标签页\""
+  },
+  {
+    "description": "c71860c77-DNv5VYLZ.js: \"Secure VM features\"",
+    "filePattern": "c71860c77-DNv5VYLZ.js",
+    "find": "\"Secure VM features\"",
+    "replace": "\"安全虚拟机功能\""
+  },
+  {
+    "description": "c71860c77-DNv5VYLZ.js: \"Require full VM sandbox\"",
+    "filePattern": "c71860c77-DNv5VYLZ.js",
+    "find": "\"Require full VM sandbox\"",
+    "replace": "\"要求完整虚拟机沙盒\""
+  },
+  {
+    "description": "c71860c77-DNv5VYLZ.js: \"Allowed egress hosts\"",
+    "filePattern": "c71860c77-DNv5VYLZ.js",
+    "find": "\"Allowed egress hosts\"",
+    "replace": "\"允许的出口主机\""
+  },
+  {
+    "description": "c71860c77-DNv5VYLZ.js: \"OpenTelemetry collector endpoint\"",
+    "filePattern": "c71860c77-DNv5VYLZ.js",
+    "find": "\"OpenTelemetry collector endpoint\"",
+    "replace": "\"OpenTelemetry 采集器端点\""
+  },
+  {
+    "description": "c71860c77-DNv5VYLZ.js: \"OpenTelemetry exporter protocol\"",
+    "filePattern": "c71860c77-DNv5VYLZ.js",
+    "find": "\"OpenTelemetry exporter protocol\"",
+    "replace": "\"OpenTelemetry 导出协议\""
+  },
+  {
+    "description": "c71860c77-DNv5VYLZ.js: \"OpenTelemetry exporter headers\"",
+    "filePattern": "c71860c77-DNv5VYLZ.js",
+    "find": "\"OpenTelemetry exporter headers\"",
+    "replace": "\"OpenTelemetry 导出请求头\""
+  },
+  {
+    "description": "c71860c77-DNv5VYLZ.js: \"Auto-update enforcement window\"",
+    "filePattern": "c71860c77-DNv5VYLZ.js",
+    "find": "\"Auto-update enforcement window\"",
+    "replace": "\"自动更新强制窗口\""
+  },
+  {
+    "description": "c71860c77-DNv5VYLZ.js: \"Block auto-updates\"",
+    "filePattern": "c71860c77-DNv5VYLZ.js",
+    "find": "\"Block auto-updates\"",
+    "replace": "\"禁止自动更新\""
+  },
+  {
+    "description": "c71860c77-DNv5VYLZ.js: \"Skip login-mode chooser\"",
+    "filePattern": "c71860c77-DNv5VYLZ.js",
+    "find": "\"Skip login-mode chooser\"",
+    "replace": "\"跳过登录模式选择\""
+  },
+  {
+    "description": "c71860c77-DNv5VYLZ.js: \"Required organization\"",
+    "filePattern": "c71860c77-DNv5VYLZ.js",
+    "find": "\"Required organization\"",
+    "replace": "\"必需的组织\""
+  },
+  {
+    "description": "c71860c77-DNv5VYLZ.js: \"Inference provider\"",
+    "filePattern": "c71860c77-DNv5VYLZ.js",
+    "find": "\"Inference provider\"",
+    "replace": "\"推理供应商\""
+  },
+  {
+    "description": "c71860c77-DNv5VYLZ.js: \"Connection\"",
+    "filePattern": "c71860c77-DNv5VYLZ.js",
+    "find": "\"Connection\"",
+    "replace": "\"连接方式\""
+  },
+  {
+    "description": "c71860c77-DNv5VYLZ.js: \"Sandbox & workspace\"",
+    "filePattern": "c71860c77-DNv5VYLZ.js",
+    "find": "\"Sandbox & workspace\"",
+    "replace": "\"沙盒与工作区\""
+  },
+  {
+    "description": "c71860c77-DNv5VYLZ.js: \"Connectors & extensions\"",
+    "filePattern": "c71860c77-DNv5VYLZ.js",
+    "find": "\"Connectors & extensions\"",
+    "replace": "\"连接器与扩展\""
+  },
+  {
+    "description": "c71860c77-DNv5VYLZ.js: \"Telemetry & updates\"",
+    "filePattern": "c71860c77-DNv5VYLZ.js",
+    "find": "\"Telemetry & updates\"",
+    "replace": "\"遥测与更新\""
+  },
+  {
+    "description": "c71860c77-DNv5VYLZ.js: \"Usage limits\"",
+    "filePattern": "c71860c77-DNv5VYLZ.js",
+    "find": "\"Usage limits\"",
+    "replace": "\"使用限制\""
+  },
+  {
+    "description": "c71860c77-DNv5VYLZ.js: \"Plugins & skills\"",
+    "filePattern": "c71860c77-DNv5VYLZ.js",
+    "find": "\"Plugins & skills\"",
+    "replace": "\"插件与技能\""
+  },
+  {
+    "description": "c71860c77-DNv5VYLZ.js: gateway:\"Gateway\"",
+    "filePattern": "c71860c77-DNv5VYLZ.js",
+    "find": "gateway:\"Gateway\"",
+    "replace": "gateway:\"自定义\""
+  },
+  {
+    "description": "cbc59a8af-DbOQVv5S.js: label:\"Chat\"",
+    "filePattern": "cbc59a8af-DbOQVv5S.js",
+    "find": "label:\"Chat\"",
+    "replace": "label:\"聊天\""
+  },
+  {
+    "description": "cbc59a8af-DbOQVv5S.js: label:\"Cowork\"",
+    "filePattern": "cbc59a8af-DbOQVv5S.js",
+    "find": "label:\"Cowork\"",
+    "replace": "label:\"协作\""
+  },
+  {
+    "description": "cbc59a8af-DbOQVv5S.js: label:\"Code\"",
+    "filePattern": "cbc59a8af-DbOQVv5S.js",
+    "find": "label:\"Code\"",
+    "replace": "label:\"代码\""
+  },
+  {
+    "description": "cbc59a8af-DbOQVv5S.js: label:\"Operon\"",
+    "filePattern": "cbc59a8af-DbOQVv5S.js",
+    "find": "label:\"Operon\"",
+    "replace": "label:\"实验室\""
+  },
+  {
+    "description": "cbc59a8af-DbOQVv5S.js: label:\"Projects\"",
+    "filePattern": "cbc59a8af-DbOQVv5S.js",
+    "find": "label:\"Projects\"",
+    "replace": "label:\"项目\""
+  },
+  {
+    "description": "cbc59a8af-DbOQVv5S.js: label:\"Scheduled\"",
+    "filePattern": "cbc59a8af-DbOQVv5S.js",
+    "find": "label:\"Scheduled\"",
+    "replace": "label:\"已安排\""
+  },
+  {
+    "description": "cbc59a8af-DbOQVv5S.js: label:\"Live artifacts\"",
+    "filePattern": "cbc59a8af-DbOQVv5S.js",
+    "find": "label:\"Live artifacts\"",
+    "replace": "label:\"实时 Artifacts\""
+  },
+  {
+    "description": "cbc59a8af-DbOQVv5S.js: label:\"Tasks\"",
+    "filePattern": "cbc59a8af-DbOQVv5S.js",
+    "find": "label:\"Tasks\"",
+    "replace": "label:\"任务\""
+  },
+  {
+    "description": "cbc59a8af-DbOQVv5S.js: label:\"Pull Requests\"",
+    "filePattern": "cbc59a8af-DbOQVv5S.js",
+    "find": "label:\"Pull Requests\"",
+    "replace": "label:\"拉取请求\""
+  },
+  {
+    "description": "cbc59a8af-DbOQVv5S.js: label:\"Replay\"",
+    "filePattern": "cbc59a8af-DbOQVv5S.js",
+    "find": "label:\"Replay\"",
+    "replace": "label:\"回放\""
+  },
+  {
+    "description": "cbc59a8af-DbOQVv5S.js: label:\"Dispatch\"",
+    "filePattern": "cbc59a8af-DbOQVv5S.js",
+    "find": "label:\"Dispatch\"",
+    "replace": "label:\"调度\""
+  },
+  {
+    "description": "cbc59a8af-DbOQVv5S.js: label:\"Ideas\"",
+    "filePattern": "cbc59a8af-DbOQVv5S.js",
+    "find": "label:\"Ideas\"",
+    "replace": "label:\"想法\""
+  },
+  {
+    "description": "cbc59a8af-DbOQVv5S.js: label:\"Apps\"",
+    "filePattern": "cbc59a8af-DbOQVv5S.js",
+    "find": "label:\"Apps\"",
+    "replace": "label:\"应用\""
+  },
+  {
+    "description": "cbc59a8af-DbOQVv5S.js: label:\"Security\"",
+    "filePattern": "cbc59a8af-DbOQVv5S.js",
+    "find": "label:\"Security\"",
+    "replace": "label:\"安全\""
+  },
+  {
+    "description": "cbc59a8af-DbOQVv5S.js: label:\"Customize\"",
+    "filePattern": "cbc59a8af-DbOQVv5S.js",
+    "find": "label:\"Customize\"",
+    "replace": "label:\"自定义\""
+  },
+  {
+    "description": "cbc59a8af-DbOQVv5S.js: label:\"Status\"",
+    "filePattern": "cbc59a8af-DbOQVv5S.js",
+    "find": "label:\"Status\"",
+    "replace": "label:\"状态\""
+  },
+  {
+    "description": "cbc59a8af-DbOQVv5S.js: label:\"Environment\"",
+    "filePattern": "cbc59a8af-DbOQVv5S.js",
+    "find": "label:\"Environment\"",
+    "replace": "label:\"环境\""
+  },
+  {
+    "description": "cbc59a8af-DbOQVv5S.js: chat:\"New chat\"",
+    "filePattern": "cbc59a8af-DbOQVv5S.js",
+    "find": "chat:\"New chat\"",
+    "replace": "chat:\"新建聊天\""
+  },
+  {
+    "description": "cbc59a8af-DbOQVv5S.js: cowork:\"New task\"",
+    "filePattern": "cbc59a8af-DbOQVv5S.js",
+    "find": "cowork:\"New task\"",
+    "replace": "cowork:\"新建任务\""
+  },
+  {
+    "description": "cbc59a8af-DbOQVv5S.js: code:\"New session\"",
+    "filePattern": "cbc59a8af-DbOQVv5S.js",
+    "find": "code:\"New session\"",
+    "replace": "code:\"新建会话\""
+  },
+  {
+    "description": "cbc59a8af-DbOQVv5S.js: operon:\"New session\"",
+    "filePattern": "cbc59a8af-DbOQVv5S.js",
+    "find": "operon:\"New session\"",
+    "replace": "operon:\"新建会话\""
+  },
+  {
+    "description": "cbc59a8af-DbOQVv5S.js: oo=\"Local\"",
+    "filePattern": "cbc59a8af-DbOQVv5S.js",
+    "find": "oo=\"Local\"",
+    "replace": "oo=\"本地\""
+  },
+  {
+    "description": "cbc59a8af-DbOQVv5S.js: io=\"Cloud\"",
+    "filePattern": "cbc59a8af-DbOQVv5S.js",
+    "find": "io=\"Cloud\"",
+    "replace": "io=\"云端\""
+  },
+  {
+    "description": "cbc59a8af-DbOQVv5S.js: ro=\"Remote Control\"",
+    "filePattern": "cbc59a8af-DbOQVv5S.js",
+    "find": "ro=\"Remote Control\"",
+    "replace": "ro=\"远程控制\""
+  },
+  {
+    "description": "cbc59a8af-DbOQVv5S.js: co=\"All\"",
+    "filePattern": "cbc59a8af-DbOQVv5S.js",
+    "find": "co=\"All\"",
+    "replace": "co=\"全部\""
+  },
+  {
+    "description": "cbc59a8af-DbOQVv5S.js: const Ea=\"Scheduled\"",
+    "filePattern": "cbc59a8af-DbOQVv5S.js",
+    "find": "const Ea=\"Scheduled\"",
+    "replace": "const Ea=\"已安排\""
+  },
+  {
+    "description": "cbc59a8af-DbOQVv5S.js: [\"active\",\"Active\"]",
+    "filePattern": "cbc59a8af-DbOQVv5S.js",
+    "find": "[\"active\",\"Active\"]",
+    "replace": "[\"active\",\"活跃\"]"
+  },
+  {
+    "description": "cbc59a8af-DbOQVv5S.js: [\"archived\",\"Archived\"]",
+    "filePattern": "cbc59a8af-DbOQVv5S.js",
+    "find": "[\"archived\",\"Archived\"]",
+    "replace": "[\"archived\",\"已归档\"]"
+  },
+  {
+    "description": "cbc59a8af-DbOQVv5S.js: [\"all\",\"All\"]",
+    "filePattern": "cbc59a8af-DbOQVv5S.js",
+    "find": "[\"all\",\"All\"]",
+    "replace": "[\"all\",\"全部\"]"
+  },
+  {
+    "description": "cbc59a8af-DbOQVv5S.js: [\"0\",\"All\"]",
+    "filePattern": "cbc59a8af-DbOQVv5S.js",
+    "find": "[\"0\",\"All\"]",
+    "replace": "[\"0\",\"全部\"]"
+  },
+  {
+    "description": "cbc59a8af-DbOQVv5S.js: [\"1\",\"1d\"]",
+    "filePattern": "cbc59a8af-DbOQVv5S.js",
+    "find": "[\"1\",\"1d\"]",
+    "replace": "[\"1\",\"1天\"]"
+  },
+  {
+    "description": "cbc59a8af-DbOQVv5S.js: [\"3\",\"3d\"]",
+    "filePattern": "cbc59a8af-DbOQVv5S.js",
+    "find": "[\"3\",\"3d\"]",
+    "replace": "[\"3\",\"3天\"]"
+  },
+  {
+    "description": "cbc59a8af-DbOQVv5S.js: [\"7\",\"7d\"]",
+    "filePattern": "cbc59a8af-DbOQVv5S.js",
+    "find": "[\"7\",\"7d\"]",
+    "replace": "[\"7\",\"7天\"]"
+  },
+  {
+    "description": "cbc59a8af-DbOQVv5S.js: [\"14\",\"14d\"]",
+    "filePattern": "cbc59a8af-DbOQVv5S.js",
+    "find": "[\"14\",\"14d\"]",
+    "replace": "[\"14\",\"14天\"]"
+  },
+  {
+    "description": "cbc59a8af-DbOQVv5S.js: [\"30\",\"30d\"]",
+    "filePattern": "cbc59a8af-DbOQVv5S.js",
+    "find": "[\"30\",\"30d\"]",
+    "replace": "[\"30\",\"30天\"]"
+  },
+  {
+    "description": "cbc59a8af-DbOQVv5S.js: \"Date\"",
+    "filePattern": "cbc59a8af-DbOQVv5S.js",
+    "find": "\"Date\"",
+    "replace": "\"日期\""
+  },
+  {
+    "description": "cbc59a8af-DbOQVv5S.js: \"None\"",
+    "filePattern": "cbc59a8af-DbOQVv5S.js",
+    "find": "\"None\"",
+    "replace": "\"无\""
+  },
+  {
+    "description": "cbc59a8af-DbOQVv5S.js: [\"project\",\"Project\"]",
+    "filePattern": "cbc59a8af-DbOQVv5S.js",
+    "find": "[\"project\",\"Project\"]",
+    "replace": "[\"project\",\"项目\"]"
+  },
+  {
+    "description": "cbc59a8af-DbOQVv5S.js: [\"state\",\"State\"]",
+    "filePattern": "cbc59a8af-DbOQVv5S.js",
+    "find": "[\"state\",\"State\"]",
+    "replace": "[\"state\",\"状态\"]"
+  },
+  {
+    "description": "cbc59a8af-DbOQVv5S.js: ?\"All\":",
+    "filePattern": "cbc59a8af-DbOQVv5S.js",
+    "find": "?\"All\":",
+    "replace": "?\"全部\":"
+  },
+  {
+    "description": "cbc59a8af-DbOQVv5S.js: children:\"Pinned\"",
+    "filePattern": "cbc59a8af-DbOQVv5S.js",
+    "find": "children:\"Pinned\"",
+    "replace": "children:\"已固定\""
+  },
+  {
+    "description": "cbc59a8af-DbOQVv5S.js: children:\"Drag to pin\"",
+    "filePattern": "cbc59a8af-DbOQVv5S.js",
+    "find": "children:\"Drag to pin\"",
+    "replace": "children:\"拖拽固定\""
+  },
+  {
+    "description": "cbc59a8af-DbOQVv5S.js: \"Drop here\"",
+    "filePattern": "cbc59a8af-DbOQVv5S.js",
+    "find": "\"Drop here\"",
+    "replace": "\"放在这里\""
+  },
+  {
+    "description": "cbc59a8af-DbOQVv5S.js: \"Let go\"",
+    "filePattern": "cbc59a8af-DbOQVv5S.js",
+    "find": "\"Let go\"",
+    "replace": "\"松开\""
+  },
+  {
+    "description": "cbc59a8af-DbOQVv5S.js: children:[\"View all\"",
+    "filePattern": "cbc59a8af-DbOQVv5S.js",
+    "find": "children:[\"View all\"",
+    "replace": "children:[\"查看全部\""
+  },
+  {
+    "description": "cbc59a8af-DbOQVv5S.js: title:\"Delete older sessions?\"",
+    "filePattern": "cbc59a8af-DbOQVv5S.js",
+    "find": "title:\"Delete older sessions?\"",
+    "replace": "title:\"删除较旧的会话？\""
+  },
+  {
+    "description": "cbc59a8af-DbOQVv5S.js: children:\"Clear filters\"",
+    "filePattern": "cbc59a8af-DbOQVv5S.js",
+    "find": "children:\"Clear filters\"",
+    "replace": "children:\"清除筛选\""
+  },
+  {
+    "description": "cbc59a8af-DbOQVv5S.js: children:\"All projects\"",
+    "filePattern": "cbc59a8af-DbOQVv5S.js",
+    "find": "children:\"All projects\"",
+    "replace": "children:\"所有项目\""
+  },
+  {
+    "description": "cbc59a8af-DbOQVv5S.js: children:\"Dev panels\"",
+    "filePattern": "cbc59a8af-DbOQVv5S.js",
+    "find": "children:\"Dev panels\"",
+    "replace": "children:\"开发面板\""
+  },
+  {
+    "description": "cbc59a8af-DbOQVv5S.js: children:\"Theme\"",
+    "filePattern": "cbc59a8af-DbOQVv5S.js",
+    "find": "children:\"Theme\"",
+    "replace": "children:\"主题\""
+  },
+  {
+    "description": "cbc59a8af-DbOQVv5S.js: children:\"Font\"",
+    "filePattern": "cbc59a8af-DbOQVv5S.js",
+    "find": "children:\"Font\"",
+    "replace": "children:\"字体\""
+  },
+  {
+    "description": "cbc59a8af-DbOQVv5S.js: children:\"Project\"",
+    "filePattern": "cbc59a8af-DbOQVv5S.js",
+    "find": "children:\"Project\"",
+    "replace": "children:\"项目\""
+  },
+  {
+    "description": "cbc59a8af-DbOQVv5S.js: const Co=\"Recents\"",
+    "filePattern": "cbc59a8af-DbOQVv5S.js",
+    "find": "const Co=\"Recents\"",
+    "replace": "const Co=\"最近\""
+  },
+  {
+    "description": "cbc59a8af-DbOQVv5S.js: label:\"Last activity\"",
+    "filePattern": "cbc59a8af-DbOQVv5S.js",
+    "find": "label:\"Last activity\"",
+    "replace": "label:\"最近活动\""
+  },
+  {
+    "description": "cbc59a8af-DbOQVv5S.js: label:\"Group by\"",
+    "filePattern": "cbc59a8af-DbOQVv5S.js",
+    "find": "label:\"Group by\"",
+    "replace": "label:\"分组方式\""
+  },
+  {
+    "description": "cbc59a8af-DbOQVv5S.js: \"Stale after\"",
+    "filePattern": "cbc59a8af-DbOQVv5S.js",
+    "find": "\"Stale after\"",
+    "replace": "\"过期时间\""
+  },
+  {
+    "description": "cbc59a8af-DbOQVv5S.js: \"Older\"",
+    "filePattern": "cbc59a8af-DbOQVv5S.js",
+    "find": "\"Older\"",
+    "replace": "\"更早\""
+  },
+  {
+    "description": "cbc59a8af-DbOQVv5S.js: \"Ungrouped\"",
+    "filePattern": "cbc59a8af-DbOQVv5S.js",
+    "find": "\"Ungrouped\"",
+    "replace": "\"未分组\""
+  },
+  {
+    "description": "index-*.js: title:\"Scheduled tasks\",subheader",
+    "filePattern": "index-*.js",
+    "find": "title:\"Scheduled tasks\",subheader",
+    "replace": "title:\"计划任务\",subheader"
+  },
+  {
+    "description": "index-*.js: message:\"Scheduled tasks only run while your computer is awake.\"",
+    "filePattern": "index-*.js",
+    "find": "message:\"Scheduled tasks only run while your computer is awake.\"",
+    "replace": "message:\"计划任务仅在计算机保持唤醒时运行。\""
+  },
+  {
+    "description": "index-*.js: Ifn={all:\"All\",active:\"Active\",archived:\"Archived\"}",
+    "filePattern": "index-*.js",
+    "find": "Ifn={all:\"All\",active:\"Active\",archived:\"Archived\"}",
+    "replace": "Ifn={all:\"全部\",active:\"活跃\",archived:\"已归档\"}"
+  },
+  {
+    "description": "index-*.js: \"No tasks yet.\"",
+    "filePattern": "index-*.js",
+    "find": "\"No tasks yet.\"",
+    "replace": "\"还没有任务。\""
+  },
+  {
+    "description": "index-*.js: \"No active tasks.\"",
+    "filePattern": "index-*.js",
+    "find": "\"No active tasks.\"",
+    "replace": "\"没有活跃任务。\""
+  },
+  {
+    "description": "index-*.js: \"No archived tasks.\"",
+    "filePattern": "index-*.js",
+    "find": "\"No archived tasks.\"",
+    "replace": "\"没有已归档任务。\""
+  },
+  {
+    "description": "index-*.js: children:\"Active\"}),renderRow",
+    "filePattern": "index-*.js",
+    "find": "children:\"Active\"}),renderRow",
+    "replace": "children:\"活跃\"}),renderRow"
+  },
+  {
+    "description": "index-*.js: children:\"New task\"",
+    "filePattern": "index-*.js",
+    "find": "children:\"New task\"",
+    "replace": "children:\"新建任务\""
+  },
+  {
+    "description": "index-*.js: ?\"New task\":\"New chat\"",
+    "filePattern": "index-*.js",
+    "find": "?\"New task\":\"New chat\"",
+    "replace": "?\"新建任务\":\"新建聊天\""
+  },
+  {
+    "description": "index-*.js: baseDescription:\"New task\"",
+    "filePattern": "index-*.js",
+    "find": "baseDescription:\"New task\"",
+    "replace": "baseDescription:\"新建任务\""
+  },
+  {
+    "description": "index-*.js: nextRun:\"Next run\",name:\"Name\"",
+    "filePattern": "index-*.js",
+    "find": "nextRun:\"Next run\",name:\"Name\"",
+    "replace": "nextRun:\"下次运行\",name:\"名称\""
+  },
+  {
+    "description": "index-*.js: children:\"3P\"",
+    "filePattern": "index-*.js",
+    "find": "children:\"3P\"",
+    "replace": "children:\"第三方\""
+  },
+  {
+    "description": "index-*.js: label:\"Documents\"",
+    "filePattern": "index-*.js",
+    "find": "label:\"Documents\"",
+    "replace": "label:\"文档\""
+  },
+  {
+    "description": "index-*.js: label:\"Files\"",
+    "filePattern": "index-*.js",
+    "find": "label:\"Files\"",
+    "replace": "label:\"文件\""
+  },
+  {
+    "description": "index-*.js: label:\"Sync Sources\"",
+    "filePattern": "index-*.js",
+    "find": "label:\"Sync Sources\"",
+    "replace": "label:\"同步源\""
+  },
+  {
+    "description": "index-*.js: title:\"Add content from GitHub\"",
+    "filePattern": "index-*.js",
+    "find": "title:\"Add content from GitHub\"",
+    "replace": "title:\"从 GitHub 添加内容\""
+  },
+  {
+    "description": "index-*.js: title:\"Connect Claude to Google Drive\"",
+    "filePattern": "index-*.js",
+    "find": "title:\"Connect Claude to Google Drive\"",
+    "replace": "title:\"将 Claude 连接到 Google Drive\""
+  },
+  {
+    "description": "index-*.js: title:\"End this call?\"",
+    "filePattern": "index-*.js",
+    "find": "title:\"End this call?\"",
+    "replace": "title:\"结束此通话？\""
+  },
+  {
+    "description": "index-*.js: title:\"Code execution and file creation\"",
+    "filePattern": "index-*.js",
+    "find": "title:\"Code execution and file creation\"",
+    "replace": "title:\"代码执行与文件创建\""
+  },
+  {
+    "description": "settings Claude Code worktree location default label",
+    "scanAllAssets": false,
+    "filePattern": "cc989143e-DMK0d3S5.js",
+    "find": "label:\"Inside project (.claude/worktrees)\"",
+    "replace": "label:\"项目内（.claude/worktrees）\""
+  },
+  {
+    "description": "settings Claude Code worktree location custom label",
+    "scanAllAssets": false,
+    "filePattern": "cc989143e-DMK0d3S5.js",
+    "find": "label:\"Custom...\"",
+    "replace": "label:\"自定义...\""
+  },
+  {
+    "description": "model picker legacy model name",
+    "filePattern": "index-*.js",
+    "find": "name:\"Legacy Model\"",
+    "replace": "name:\"旧版模型\""
   }
 ]

@@ -1,85 +1,24 @@
-import json
-import os
-import shutil
+import argparse
 from datetime import datetime
 from pathlib import Path
 
-PROJECT_ROOT = Path(__file__).resolve().parent.parent
-CONFIG = json.loads((PROJECT_ROOT / 'config.json').read_text(encoding='utf-8'))
-PATCHES = json.loads((PROJECT_ROOT / 'patches' / 'main-ui-patches.json').read_text(encoding='utf-8'))
-
-BACKUP_ROOT = PROJECT_ROOT / CONFIG['backupDirName']
-ROOT_LOCALE_SRC = PROJECT_ROOT / 'locales' / 'root-zh-CN.json'
-ION_LOCALE_SRC = PROJECT_ROOT / 'locales' / 'ion-zh-CN.json'
-ROOT_LOCALE_DST = Path(CONFIG['applyTargets']['rootLocale'])
-ION_LOCALE_DST = Path(CONFIG['applyTargets']['ionLocale'])
-ASSETS_DIR = Path(CONFIG['applyTargets']['assetsDir'])
-ION_OVERRIDES_SRC = PROJECT_ROOT / 'locales' / 'ion-zh-CN.overrides.json'
-ION_OVERRIDES_DST = Path(CONFIG.get('optionalTargets', {}).get('ionOverrides', '')) if CONFIG.get('optionalTargets', {}).get('ionOverrides') else None
-STATSIG_SRC_DIR = PROJECT_ROOT / 'locales' / 'statsig'
-STATSIG_DST_DIR = Path(CONFIG.get('optionalTargets', {}).get('statsigDir', '')) if CONFIG.get('optionalTargets', {}).get('statsigDir') else None
-ENCODING = CONFIG.get('encoding', 'utf-8')
+from common import (
+    BACKUP_ROOT, CONFIG, ENCODING, ION_LOCALE_SRC, ION_OVERRIDES_SRC, PATCHES,
+    ROOT_LOCALE_SRC, STATSIG_SRC_DIR, ApplyTargets, copy2_best_effort,
+    decode_patch_text, ensure_assets_dir, ensure_dir, ensure_file_exists,
+    expand_path, find_claude_package, patch_file_pattern, resolve_apply_targets,
+    write_text_best_effort,
+)
 
 
 def timestamp() -> str:
     return datetime.now().strftime('%Y%m%d-%H%M%S')
 
 
-def ensure_dir(path: Path) -> None:
-    path.mkdir(parents=True, exist_ok=True)
-
-
-def ensure_file_exists(path: Path, description: str) -> None:
-    if not path.exists():
-        raise SystemExit(f'{description} not found or inaccessible: {path}')
-
-
-def ensure_assets_dir(path: Path) -> None:
-    if not path.exists():
-        raise SystemExit(f'Assets directory not found or inaccessible: {path}')
-    if not path.is_dir():
-        raise SystemExit(f'Assets path is not a directory: {path}')
-
-
-def expand_path(value: str) -> Path:
-    return Path(os.path.expandvars(value))
-
-
-def find_existing_paths(candidates: list[str]) -> list[Path]:
-    paths = []
-    for candidate in candidates:
-        path = expand_path(candidate)
-        if path.exists():
-            paths.append(path)
-    return paths
-
-
-def detect_optional_resources() -> dict[str, object]:
-    overrides_exists = bool(ION_OVERRIDES_DST and ION_OVERRIDES_DST.exists())
-    statsig_exists = bool(STATSIG_DST_DIR and STATSIG_DST_DIR.exists() and STATSIG_DST_DIR.is_dir())
-    statsig_files = sorted(STATSIG_DST_DIR.glob('*.json')) if statsig_exists else []
-    return {
-        'availableInstallRoots': [str(path) for path in find_existing_paths(CONFIG.get('installCandidates', []))],
-        'ionOverrides': {
-            'configured': bool(ION_OVERRIDES_DST),
-            'exists': overrides_exists,
-            'sourceExists': ION_OVERRIDES_SRC.exists(),
-            'target': str(ION_OVERRIDES_DST) if ION_OVERRIDES_DST else None,
-        },
-        'statsig': {
-            'configured': bool(STATSIG_DST_DIR),
-            'exists': statsig_exists,
-            'sourceExists': STATSIG_SRC_DIR.exists(),
-            'target': str(STATSIG_DST_DIR) if STATSIG_DST_DIR else None,
-            'targetFiles': [str(path) for path in statsig_files],
-        },
-    }
-
-
 def backup_file(src: Path, backup_dir: Path) -> None:
     ensure_dir(backup_dir)
     if src.exists():
-        shutil.copy2(src, backup_dir / src.name)
+        copy2_best_effort(src, backup_dir / src.name, 'backup file')
 
 
 def backup_tree(src_dir: Path, backup_dir: Path) -> list[str]:
@@ -88,160 +27,169 @@ def backup_tree(src_dir: Path, backup_dir: Path) -> list[str]:
     if not src_dir.exists() or not src_dir.is_dir():
         return copied
     for item in sorted(src_dir.glob('*.json')):
-        shutil.copy2(item, backup_dir / item.name)
+        copy2_best_effort(item, backup_dir / item.name, 'backup tree file')
         copied.append(str(item))
     return copied
 
 
-def decode_patch_text(value: str) -> str:
-    return value.encode('utf-8').decode('unicode_escape')
+def find_existing_paths(candidates: list[str]) -> list[Path]:
+    return [p for c in candidates if (p := expand_path(c)).exists()]
 
 
-def analyze_patch_hits(paths: list[Path]) -> list[dict[str, object]]:
-    patch_results: list[dict[str, object]] = []
+def detect_optional_resources(targets: ApplyTargets) -> dict:
+    overrides_exists = bool(targets.ion_overrides and targets.ion_overrides.exists())
+    statsig_exists = bool(targets.statsig_dir and targets.statsig_dir.exists() and targets.statsig_dir.is_dir())
+    return {
+        'availableInstallRoots': [str(p) for p in find_existing_paths(CONFIG.get('installCandidates', []))],
+        'ionOverrides': {
+            'configured': bool(targets.ion_overrides),
+            'exists': overrides_exists,
+            'sourceExists': ION_OVERRIDES_SRC.exists(),
+            'target': str(targets.ion_overrides) if targets.ion_overrides else None,
+        },
+        'statsig': {
+            'configured': bool(targets.statsig_dir),
+            'exists': statsig_exists,
+            'sourceExists': STATSIG_SRC_DIR.exists(),
+            'target': str(targets.statsig_dir) if targets.statsig_dir else None,
+            'targetFiles': [str(p) for p in sorted(targets.statsig_dir.glob('*.json'))] if statsig_exists else [],
+        },
+    }
+
+
+def analyze_patch_hits(assets_dir: Path) -> list[dict]:
+    results = []
     for item in PATCHES:
         find = decode_patch_text(item['find'])
         replace = decode_patch_text(item['replace'])
-        matched_files: list[dict[str, object]] = []
-        replaced_files: list[dict[str, object]] = []
-        total_hits = 0
-        total_replaced_hits = 0
+        matched, replaced = [], []
+        paths = sorted(assets_dir.glob(patch_file_pattern(item)))
         for path in paths:
             try:
                 text = path.read_text(encoding=ENCODING)
             except Exception:
                 continue
-            count = text.count(find)
-            replaced_count = text.count(replace)
-            if count:
-                matched_files.append({'file': str(path), 'count': count})
-                total_hits += count
-            if replaced_count:
-                replaced_files.append({'file': str(path), 'count': replaced_count})
-                total_replaced_hits += replaced_count
-        patch_results.append(
-            {
-                'description': item['description'],
-                'find': item['find'],
-                'replace': item['replace'],
-                'matched': total_hits > 0,
-                'alreadyPatched': total_hits == 0 and total_replaced_hits > 0,
-                'totalHits': total_hits,
-                'totalReplacedHits': total_replaced_hits,
-                'files': matched_files,
-                'replacedFiles': replaced_files,
-            }
-        )
-    return patch_results
+            if c := text.count(find):
+                matched.append({'file': str(path), 'count': c})
+            if c := text.count(replace):
+                replaced.append({'file': str(path), 'count': c})
+        results.append({
+            'description': item['description'],
+            'find': item['find'],
+            'replace': item['replace'],
+            'matched': bool(matched),
+            'alreadyPatched': not matched and bool(replaced),
+            'totalHits': sum(f['count'] for f in matched),
+            'totalReplacedHits': sum(f['count'] for f in replaced),
+            'files': matched,
+            'replacedFiles': replaced,
+        })
+    return results
 
 
 def apply_patches_to_file(path: Path) -> list[tuple[str, int]]:
     text = path.read_text(encoding=ENCODING)
-    changed = False
-    counts: list[tuple[str, int]] = []
+    changed, counts = False, []
     for item in PATCHES:
         find = decode_patch_text(item['find'])
         replace = decode_patch_text(item['replace'])
         if find == replace:
             continue
-        count = text.count(find)
-        if count:
+        if count := text.count(find):
             text = text.replace(find, replace)
             changed = True
             counts.append((item['description'], count))
     if changed:
-        path.write_text(text, encoding=ENCODING)
+        write_text_best_effort(path, text, 'asset patch')
     return counts
 
 
-def sync_optional_resources(run_dir: Path) -> dict[str, object]:
-    optional_report = detect_optional_resources()
+def sync_optional_resources(run_dir: Path, targets: ApplyTargets) -> dict:
+    report = detect_optional_resources(targets)
 
-    if optional_report['ionOverrides']['exists'] and ION_OVERRIDES_DST:
-        backup_file(ION_OVERRIDES_DST, run_dir / 'ion-overrides')
+    if report['ionOverrides']['exists'] and targets.ion_overrides:
+        backup_file(targets.ion_overrides, run_dir / 'ion-overrides')
         if ION_OVERRIDES_SRC.exists():
-            shutil.copy2(ION_OVERRIDES_SRC, ION_OVERRIDES_DST)
-            optional_report['ionOverrides']['synced'] = True
+            copy2_best_effort(ION_OVERRIDES_SRC, targets.ion_overrides, 'ion overrides')
+            report['ionOverrides']['synced'] = True
         else:
-            optional_report['ionOverrides']['synced'] = False
+            report['ionOverrides']['synced'] = False
     else:
-        optional_report['ionOverrides']['synced'] = False
+        report['ionOverrides']['synced'] = False
 
-    if optional_report['statsig']['exists'] and STATSIG_DST_DIR:
-        optional_report['statsig']['backedUpFiles'] = backup_tree(STATSIG_DST_DIR, run_dir / 'statsig')
+    if report['statsig']['exists'] and targets.statsig_dir:
+        report['statsig']['backedUpFiles'] = backup_tree(targets.statsig_dir, run_dir / 'statsig')
         if STATSIG_SRC_DIR.exists():
-            copied_files: list[str] = []
+            copied = []
             for src_file in sorted(STATSIG_SRC_DIR.glob('*.json')):
-                shutil.copy2(src_file, STATSIG_DST_DIR / src_file.name)
-                copied_files.append(str(src_file))
-            optional_report['statsig']['synced'] = True
-            optional_report['statsig']['copiedFiles'] = copied_files
+                copy2_best_effort(src_file, targets.statsig_dir / src_file.name, 'statsig resource')
+                copied.append(str(src_file))
+            report['statsig']['synced'] = True
+            report['statsig']['copiedFiles'] = copied
         else:
-            optional_report['statsig']['synced'] = False
-            optional_report['statsig']['copiedFiles'] = []
+            report['statsig'].update({'synced': False, 'copiedFiles': []})
     else:
-        optional_report['statsig']['synced'] = False
-        optional_report['statsig']['copiedFiles'] = []
-        optional_report['statsig']['backedUpFiles'] = []
+        report['statsig'].update({'synced': False, 'copiedFiles': [], 'backedUpFiles': []})
 
-    return optional_report
+    return report
+
+
+def parse_args() -> argparse.Namespace:
+    parser = argparse.ArgumentParser(description='Apply Claude Desktop zh-CN localization')
+    parser.add_argument('--app-dir', help='Claude app directory. Auto-detected when omitted if configured paths are missing.')
+    parser.add_argument('--auto-detect', action='store_true', help='Force WindowsApps package auto-detection.')
+    return parser.parse_args()
 
 
 def main() -> None:
-    ensure_file_exists(ROOT_LOCALE_DST, 'Target root locale')
-    ensure_file_exists(ION_LOCALE_DST, 'Target ion locale')
-    ensure_assets_dir(ASSETS_DIR)
+    args = parse_args()
+    app_dir = Path(args.app_dir) if args.app_dir else None
+    targets = resolve_apply_targets(app_dir, auto_detect=True)
+
+    ensure_file_exists(targets.root_locale, 'Target root locale')
+    ensure_file_exists(targets.ion_locale, 'Target ion locale')
+    ensure_assets_dir(targets.assets_dir)
 
     run_dir = BACKUP_ROOT / timestamp()
     ensure_dir(run_dir)
-    backup_file(ROOT_LOCALE_DST, run_dir / 'root')
-    backup_file(ION_LOCALE_DST, run_dir / 'ion')
+    backup_file(targets.root_locale, run_dir / 'root')
+    backup_file(targets.ion_locale, run_dir / 'ion')
 
-    assets_paths = sorted(ASSETS_DIR.glob('*.js'))
-    patch_analysis = analyze_patch_hits(assets_paths)
+    assets_paths = sorted(targets.assets_dir.glob('*.js'))
+    patch_analysis = analyze_patch_hits(targets.assets_dir)
     patch_targets = [
-        path
-        for path in assets_paths
-        if any(file_info['file'] == str(path) for result in patch_analysis for file_info in result['files'])
+        p for p in assets_paths
+        if any(f['file'] == str(p) for r in patch_analysis for f in r['files'])
     ]
 
     for path in patch_targets:
         backup_file(path, run_dir / 'assets')
 
-    shutil.copy2(ROOT_LOCALE_SRC, ROOT_LOCALE_DST)
-    shutil.copy2(ION_LOCALE_SRC, ION_LOCALE_DST)
-    optional_report = sync_optional_resources(run_dir)
+    copy2_best_effort(ROOT_LOCALE_SRC, targets.root_locale, 'root locale')
+    copy2_best_effort(ION_LOCALE_SRC, targets.ion_locale, 'ion locale')
+    optional_report = sync_optional_resources(run_dir, targets)
 
-    file_report: list[dict[str, object]] = []
+    file_report = []
     for path in patch_targets:
-        counts = apply_patches_to_file(path)
-        if counts:
-            file_report.append(
-                {
-                    'file': str(path),
-                    'changes': [{'description': d, 'count': c} for d, c in counts],
-                }
-            )
+        if counts := apply_patches_to_file(path):
+            file_report.append({'file': str(path), 'changes': [{'description': d, 'count': c} for d, c in counts]})
 
     report = {
         'summary': {
             'totalPatches': len(PATCHES),
-            'matchedPatches': sum(1 for item in patch_analysis if item['matched']),
-            'alreadyPatchedPatches': sum(1 for item in patch_analysis if item['alreadyPatched']),
-            'unmatchedPatches': sum(1 for item in patch_analysis if not item['matched'] and not item['alreadyPatched']),
+            'matchedPatches': sum(1 for r in patch_analysis if r['matched']),
+            'alreadyPatchedPatches': sum(1 for r in patch_analysis if r['alreadyPatched']),
+            'unmatchedPatches': sum(1 for r in patch_analysis if not r['matched'] and not r['alreadyPatched']),
             'patchedFiles': len(file_report),
         },
         'patches': patch_analysis,
         'files': file_report,
         'optionalResources': optional_report,
-        'copiedLocales': {
-            'rootLocale': str(ROOT_LOCALE_DST),
-            'ionLocale': str(ION_LOCALE_DST),
-        },
+        'copiedLocales': {'rootLocale': str(targets.root_locale), 'ionLocale': str(targets.ion_locale)},
     }
 
     report_path = run_dir / 'apply-report.json'
-    report_path.write_text(json.dumps(report, ensure_ascii=False, indent=2), encoding=ENCODING)
+    report_path.write_text(__import__('json').dumps(report, ensure_ascii=False, indent=2), encoding=ENCODING)
     print(f'Applied localization. Backup saved at: {run_dir}')
     print(f"Patched files: {report['summary']['patchedFiles']}")
     print(f"Matched patches: {report['summary']['matchedPatches']}/{report['summary']['totalPatches']}")

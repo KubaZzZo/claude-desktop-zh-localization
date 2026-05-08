@@ -13,5 +13,5 @@ if errorlevel 1 (
 
 echo.
 echo [2/2] 应用汉化...
-py -3 scripts\apply_localization.py
+py -3 scripts\apply_localization.py %*
 endlocal

@@ -1,95 +1,70 @@
+import argparse
 import json
 from pathlib import Path
 
-PROJECT_ROOT = Path(__file__).resolve().parent.parent
-CONFIG = json.loads((PROJECT_ROOT / 'config.json').read_text(encoding='utf-8'))
-PATCHES = json.loads((PROJECT_ROOT / 'patches' / 'main-ui-patches.json').read_text(encoding='utf-8'))
-ENCODING = CONFIG.get('encoding', 'utf-8')
-
-ROOT_LOCALE_DST = Path(CONFIG['applyTargets']['rootLocale'])
-ION_LOCALE_DST = Path(CONFIG['applyTargets']['ionLocale'])
-ASSETS_DIR = Path(CONFIG['applyTargets']['assetsDir'])
-ION_OVERRIDES_DST = Path(CONFIG.get('optionalTargets', {}).get('ionOverrides', '')) if CONFIG.get('optionalTargets', {}).get('ionOverrides') else None
-STATSIG_DST_DIR = Path(CONFIG.get('optionalTargets', {}).get('statsigDir', '')) if CONFIG.get('optionalTargets', {}).get('statsigDir') else None
-STATSIG_SRC_DIR = PROJECT_ROOT / 'locales' / 'statsig'
-ION_OVERRIDES_SRC = PROJECT_ROOT / 'locales' / 'ion-zh-CN.overrides.json'
+from common import (
+    CONFIG, ENCODING, ION_OVERRIDES_SRC, PATCHES, STATSIG_SRC_DIR, ApplyTargets,
+    decode_patch_text, ensure_assets_dir, ensure_file_exists, find_claude_package,
+    patch_file_pattern, resolve_apply_targets,
+)
 
 
-def decode_patch_text(value: str) -> str:
-    return value.encode('utf-8').decode('unicode_escape')
-
-
-def ensure_file_exists(path: Path, description: str) -> None:
-    if not path.exists():
-        raise SystemExit(f'{description} not found or inaccessible: {path}')
-
-
-def ensure_assets_dir(path: Path) -> None:
-    if not path.exists():
-        raise SystemExit(f'Assets directory not found or inaccessible: {path}')
-    if not path.is_dir():
-        raise SystemExit(f'Assets path is not a directory: {path}')
-
-
-def verify_locales() -> list[str]:
-    issues: list[str] = []
-    root_text = ROOT_LOCALE_DST.read_text(encoding=ENCODING)
-    ion_text = ION_LOCALE_DST.read_text(encoding=ENCODING)
-    expected_entries = [
-        ('"wVu1FLTwAn": "开始吧"', 'ion zh-CN 缺少开始吧'),
-        ('"CJsWpnmYD4": "开始处理你的待办事项"', 'ion zh-CN 缺少首页标题翻译'),
-        ('"EfdnINFnIz": "文件"', 'root zh-CN 缺少顶层菜单翻译'),
-        ('"qm/eL5Y8Fl": "其他选项"', 'ion zh-CN 缺少其他选项翻译'),
-        ('"qmzHEfH73H": "测试安装说明"', 'ion zh-CN 缺少安装说明翻译'),
-    ]
-    for expected, message in expected_entries:
-        target_text = root_text if 'root zh-CN' in message else ion_text
-        if expected not in target_text:
-            issues.append(message)
+def verify_locales(targets: ApplyTargets) -> list[str]:
+    issues = []
+    root_data = json.loads(targets.root_locale.read_text(encoding=ENCODING))
+    ion_data = json.loads(targets.ion_locale.read_text(encoding=ENCODING))
+    for entry in CONFIG.get('verifyEntries', []):
+        data = root_data if entry.get('file') == 'root' else ion_data
+        if data.get(entry['key']) != entry['value']:
+            issues.append(entry['message'])
     return issues
 
 
-def verify_optional_resources() -> list[str]:
-    issues: list[str] = []
-    if ION_OVERRIDES_DST and ION_OVERRIDES_DST.exists() and ION_OVERRIDES_SRC.exists():
-        target_text = ION_OVERRIDES_DST.read_text(encoding=ENCODING)
-        source_text = ION_OVERRIDES_SRC.read_text(encoding=ENCODING)
-        if target_text != source_text:
-            issues.append('ion overrides 文件未与项目副本同步')
-    if STATSIG_DST_DIR and STATSIG_DST_DIR.exists() and STATSIG_SRC_DIR.exists():
-        for source_file in sorted(STATSIG_SRC_DIR.glob('*.json')):
-            target_file = STATSIG_DST_DIR / source_file.name
-            if not target_file.exists():
-                issues.append(f'statsig 缺少目标文件: {source_file.name}')
-                continue
-            if target_file.read_text(encoding=ENCODING) != source_file.read_text(encoding=ENCODING):
-                issues.append(f'statsig 文件未同步: {source_file.name}')
+def verify_optional_resources(targets: ApplyTargets) -> list[str]:
+    issues = []
+    if targets.ion_overrides and targets.ion_overrides.exists() and ION_OVERRIDES_SRC.exists():
+        if targets.ion_overrides.read_text(encoding=ENCODING) != ION_OVERRIDES_SRC.read_text(encoding=ENCODING):
+            issues.append('ion overrides file is not synced with project copy')
+    if targets.statsig_dir and targets.statsig_dir.exists() and STATSIG_SRC_DIR.exists():
+        for src in sorted(STATSIG_SRC_DIR.glob('*.json')):
+            dst = targets.statsig_dir / src.name
+            if not dst.exists():
+                issues.append(f'statsig target file missing: {src.name}')
+            elif dst.read_text(encoding=ENCODING) != src.read_text(encoding=ENCODING):
+                issues.append(f'statsig file is not synced: {src.name}')
     return issues
 
 
-def verify_assets() -> list[str]:
-    issues: list[str] = []
+def verify_assets(targets: ApplyTargets) -> list[str]:
+    issues = []
     for patch in PATCHES:
         old = decode_patch_text(patch['find'])
-        for path in ASSETS_DIR.glob('*.js'):
+        for path in targets.assets_dir.glob(patch_file_pattern(patch)):
             try:
-                text = path.read_text(encoding=ENCODING)
+                if old in path.read_text(encoding=ENCODING):
+                    issues.append(f"English fallback remains: {patch['description']} -> {path.name}")
             except Exception:
                 continue
-            if old in text:
-                issues.append(f"仍有英文回退残留: {patch['description']} -> {path.name}")
     return issues
+
+
+def parse_args() -> argparse.Namespace:
+    parser = argparse.ArgumentParser(description='Verify Claude Desktop zh-CN localization')
+    parser.add_argument('--app-dir', help='Claude app directory. Auto-detected when omitted if configured paths are missing.')
+    parser.add_argument('--auto-detect', action='store_true', help='Force WindowsApps package auto-detection.')
+    return parser.parse_args()
 
 
 def main() -> None:
-    ensure_file_exists(ROOT_LOCALE_DST, 'Target root locale')
-    ensure_file_exists(ION_LOCALE_DST, 'Target ion locale')
-    ensure_assets_dir(ASSETS_DIR)
+    args = parse_args()
+    app_dir = Path(args.app_dir) if args.app_dir else None
+    targets = resolve_apply_targets(app_dir, auto_detect=True)
 
-    issues: list[str] = []
-    issues.extend(verify_locales())
-    issues.extend(verify_optional_resources())
-    issues.extend(verify_assets())
+    ensure_file_exists(targets.root_locale, 'Target root locale')
+    ensure_file_exists(targets.ion_locale, 'Target ion locale')
+    ensure_assets_dir(targets.assets_dir)
+
+    issues = verify_locales(targets) + verify_optional_resources(targets) + verify_assets(targets)
     if issues:
         print('VERIFY FAILED')
         for item in issues:

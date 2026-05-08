@@ -18,5 +18,12 @@
     "statsigDir": "C:\\Program Files\\WindowsApps\\Claude_1.3883.0.0_x64__pzs8sxrjxfjjc\\app\\resources\\ion-dist\\i18n\\statsig"
   },
   "backupDirName": "backups",
-  "encoding": "utf-8"
+  "encoding": "utf-8",
+  "verifyEntries": [
+    { "file": "ion", "key": "wVu1FLTwAn", "value": "开始吧", "message": "ion zh-CN 缺少开始吧" },
+    { "file": "ion", "key": "CJsWpnmYD4", "value": "先完成清单上的一件事", "message": "ion zh-CN 缺少首页标题翻译" },
+    { "file": "root", "key": "EfdnINFnIz", "value": "文件", "message": "root zh-CN 缺少顶层菜单翻译" },
+    { "file": "ion", "key": "qm/eL5Y8Fl", "value": "其他的东西", "message": "ion zh-CN 缺少其他选项翻译" },
+    { "file": "ion", "key": "qmzHEfH73H", "value": "测试设置说明", "message": "ion zh-CN 缺少安装说明翻译" }
+  ]
 }
