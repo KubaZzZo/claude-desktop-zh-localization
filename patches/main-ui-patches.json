@@ -701,5 +701,23 @@
     "filePattern": "c1b9abf13-*.js",
     "find": "placeholder:\"Search projects\"",
     "replace": "placeholder:\"搜索项目\""
+  },
+  {
+    "description": "scheduled tasks page hardcoded subheader",
+    "filePattern": "index-*.js",
+    "find": "children:\"Run tasks on a schedule or whenever you need them. Type /schedule in any existing task to set one up.\"",
+    "replace": "children:\"按计划运行任务，或在需要时随时运行。可在任何现有任务中输入 /schedule 来设置。\""
+  },
+  {
+    "description": "scheduled tasks page hardcoded empty state",
+    "filePattern": "index-*.js",
+    "find": "\"No scheduled tasks yet.\"",
+    "replace": "\"暂无计划任务。\""
+  },
+  {
+    "description": "scheduled tasks page hardcoded no search results",
+    "filePattern": "index-*.js",
+    "find": "\"No scheduled tasks match your search.\"",
+    "replace": "\"没有匹配你搜索的计划任务。\""
   }
 ]
