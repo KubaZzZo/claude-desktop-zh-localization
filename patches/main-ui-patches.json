@@ -653,5 +653,53 @@
     "filePattern": "index-*.js",
     "find": "name:\"Legacy Model\"",
     "replace": "name:\"旧版模型\""
+  },
+  {
+    "description": "projects page hardcoded create label",
+    "filePattern": "c1b9abf13-*.js",
+    "find": "const Qe=\"New project\"",
+    "replace": "const Qe=\"新建项目\""
+  },
+  {
+    "description": "projects page hardcoded section labels",
+    "filePattern": "c1b9abf13-*.js",
+    "find": "Xe={yours:\"Your projects\",team:\"Team\",shared:\"Shared with you\"}",
+    "replace": "Xe={yours:\"你的项目\",team:\"团队\",shared:\"与你共享\"}"
+  },
+  {
+    "description": "projects page hardcoded empty states",
+    "filePattern": "c1b9abf13-*.js",
+    "find": "Ze={yours:\"You don't have any projects yet.\",team:\"No team projects yet.\",shared:\"No projects have been shared with you.\"}",
+    "replace": "Ze={yours:\"你还没有任何项目。\",team:\"暂无团队项目。\",shared:\"还没有与你共享的项目。\"}"
+  },
+  {
+    "description": "projects page hardcoded sort names",
+    "filePattern": "c1b9abf13-*.js",
+    "find": "Ge={recent:\"Recent\",created:\"Created\",alphabetical:\"Alphabetical\"}",
+    "replace": "Ge={recent:\"最近\",created:\"创建时间\",alphabetical:\"按字母排序\"}"
+  },
+  {
+    "description": "projects page hardcoded title prop",
+    "filePattern": "c1b9abf13-*.js",
+    "find": "B,{title:\"Projects\",tabs:ge",
+    "replace": "B,{title:\"项目\",tabs:ge"
+  },
+  {
+    "description": "projects page hardcoded no search results",
+    "filePattern": "c1b9abf13-*.js",
+    "find": "children:\"No projects match your search.\"",
+    "replace": "children:\"没有匹配你搜索的项目。\""
+  },
+  {
+    "description": "projects page hardcoded project type menu",
+    "filePattern": "c1b9abf13-*.js",
+    "find": "children:\"Chat project\"}),e.jsx(X,{onSelect:me,children:\"Cowork project\"})",
+    "replace": "children:\"聊天项目\"}),e.jsx(X,{onSelect:me,children:\"协作项目\"})"
+  },
+  {
+    "description": "projects page hardcoded search placeholder",
+    "filePattern": "c1b9abf13-*.js",
+    "find": "placeholder:\"Search projects\"",
+    "replace": "placeholder:\"搜索项目\""
   }
 ]
