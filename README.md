@@ -467,6 +467,12 @@ py -3 scripts\auto_localize.py --report backups\auto-localize-next.json
 
 如果有新增英文残留，再按“维护新翻译”继续补。
 
+## 社区与致谢
+
+感谢 [LINUX DO 社区](https://linux.do/) 中关注 Claude Desktop 中文本地化、反馈界面残留英文和分享使用经验的朋友。
+
+本项目不是 LINUX DO 官方项目，也不代表 LINUX DO 官方立场。这里的链接仅用于致谢和指向相关社区讨论入口，避免误解为官方认证、官方授权或官方背书。
+
 ## 发布和提交建议
 
 提交前至少运行：
